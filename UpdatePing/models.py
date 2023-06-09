@@ -14,10 +14,18 @@ class Game(models.Model):
     def get_app_Id_from_game_title(app_name):
 
         # Retrieve the AppID for a game or application
-        app_id = steam.search(app_name)
-
-        print("AppID:", app_id)
-        return app_id
+        url = f"https://store.steampowered.com/api/storesearch/?term={app_name}&l=english&cc=us"
+    
+        try:
+            response = requests.get(url)
+            data = response.json()
+            if data['total'] > 0:
+                app_id = data['items'][0]['id']
+                return int(app_id)
+        except requests.exceptions.RequestException as e:
+            print("Error occurred while making the API call:", e)
+    
+        return None
 
     @staticmethod
     def get_game_from_steam(app_id):
@@ -25,6 +33,7 @@ class Game(models.Model):
         r = requests.get(url, headers={'Content-Type':      
             'application/json'})
         game = r.json()
+        print(game)
         return game
     
 # Create your models here.
