@@ -28,13 +28,30 @@ class Game(models.Model):
         return None
 
     @staticmethod
-    def get_game_from_steam(app_id):
-        url = 'http://api.steampowered.com/ISteamNews/GetNewsForApp/v0002/?appid='+app_id+'&count=3&maxlength=300&format=json'
-        r = requests.get(url, headers={'Content-Type':      
-            'application/json'})
-        game = r.json()
-        print(game)
-        return game
+    def get_newsfeed_from_steam(app_id):
+        url=f"https://api.steampowered.com/ISteamNews/GetNewsForApp/v0002/?appid={app_id}&count=3&maxlength=300"
+
+        try:
+            response = requests.get(url)
+            data = response.json()
+            return data
+        except Exception as e:
+            print("Error occurred while making the API call:", e)
+    
+        return None
+
+    @staticmethod
+    def get_game_name(app_id):
+        url = f"http://api.steampowered.com/ISteamApps/GetAppList/v2"
+        try:
+            response = requests.get(url)
+            data = response.json()
+            for app in data["applist"]["apps"]:
+                if app["appid"] == app_id:
+                    return app["name"]
+        except Exception as e:
+            print(e)
+        return None
     
 # Create your models here.
 class User(models.Model):
